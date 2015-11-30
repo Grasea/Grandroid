@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="grand_btn_cancel">取消</string>
+  <string name="grand_btn_yes">確定</string>
+  <string name="grand_btn_close">關閉</string>
+  <string name="grand_btn_delete">刪除</string>
+</resources>
