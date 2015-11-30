@@ -8,7 +8,7 @@ import android.view.View;
 
 /**
  * 執行動作的指令單元，將操作包裝起來
- * 通常作為callback的用途 測試
+ * 通常作為callback的用途
  * @author Rovers
  */
 public class Action {
