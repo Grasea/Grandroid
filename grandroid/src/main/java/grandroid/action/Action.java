@@ -33,7 +33,7 @@ public class Action {
     }
 
     /**
-     * 
+     *
      * @param actionName 指令名稱
      */
     public Action(String actionName) {
@@ -41,7 +41,7 @@ public class Action {
     }
 
     /**
-     * 
+     *
      * @param src 來源物件
      */
     public Action(View src) {
@@ -49,15 +49,15 @@ public class Action {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public View getSrc() {
         return src;
     }
 
     /**
-     * 
+     *
      * @param src
      * @return 回傳Action實體自己
      */
@@ -75,7 +75,7 @@ public class Action {
     }
 
     /**
-     * 
+     *
      * @param actionName
      * @return 回傳Action實體自己
      */
@@ -85,7 +85,7 @@ public class Action {
     }
 
     /**
-     * 
+     *
      * @param args 應為物件陣列，設過Args之後，一般會在execute函數裡使用args來取回所傳遞的資料
      * @return 回傳Action實體自己
      */
