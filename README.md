@@ -1,6 +1,7 @@
 # Grandroid
 Android open source library
 
+
 #How to import to project
 ```
 repositories {
@@ -10,8 +11,9 @@ repositories {
 }
 
 dependencies {
-    compile 'com.grasea:grandview:1.0.0'
+    compile 'com.grasea:gradview:1.0.4'
 }
 ```
 #Release Note
 2015/11/30：Upload Project.
+2015/12/01：Fix Bug.
