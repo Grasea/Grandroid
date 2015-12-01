@@ -15,7 +15,10 @@ dependencies {
 }
 ```
 #Release Note
+Version 1.0.0 *(2015-11-30)*
+----------------------------
+Upload Project.
 
-[2015/11/30]1.0.0：Upload Project.
-
-[2015/12/01]1.0.4：Fix Bug.
+Version 1.0.4 *(2015-12-01)*
+-------------------
+Fix Bug.
