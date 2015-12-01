@@ -14,7 +14,7 @@ dependencies {
     compile 'com.grasea:gradview:1.0.4'
 }
 ```
-#Release Note
+#Change Log
 Version 1.0.0 *(2015-11-30)*
 ----------------------------
 Upload Project.
