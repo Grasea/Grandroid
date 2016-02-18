@@ -11,7 +11,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.grasea:gradview:1.0.4'
+    compile 'com.grasea:grandroid:1.0.3'
 }
 ```
 #Change Log
