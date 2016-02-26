@@ -2,7 +2,13 @@
 Android open source library
 
 
-#How to import to project
+#How to import Grandroid to project
+```
+dependencies {
+    compile 'com.grasea:grandroid:1.0.3'
+}
+```
+#Only import database
 ```
 repositories {
     maven {
@@ -11,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.grasea:grandroid:1.0.3'
+    compile 'com.grasea:grandroid-database:1.0.0'
 }
 ```
 #Change Log
