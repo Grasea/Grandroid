@@ -378,4 +378,9 @@ public class ApacheMon extends Mon {
             throw new Exception("http connect fail code=" + response.getStatusLine().getStatusCode());
         }
     }
+
+    public List<Cookie> getCookies() {
+        return cookies;
+    }
+    
 }

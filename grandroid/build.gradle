@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-version = "1.0.3"
+version = "1.0.5"
 android {
     compileSdkVersion 22
     buildToolsVersion "23.0.2"
@@ -61,8 +61,8 @@ install {
             developers {
                 developer {
                     id 'ch8154'        // 填写的一些基本信息
-                    name 'Alan Ding'
-                    email 'ch8154@gmail.com'
+                    name 'Rovers Yang'
+                    email 'roversyang@gmail.com'
                 }
             }
             scm {

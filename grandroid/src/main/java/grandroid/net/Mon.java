@@ -63,7 +63,7 @@ public class Mon {
     /**
      *
      */
-    protected boolean isHttps;
+    public boolean isHttps;
     /**
      *
      */
