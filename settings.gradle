@@ -1,1 +1,1 @@
-include ':grandroid', ':grandroid-database'
+include ':grandroid', ':grandroid-database', ':grangeo'
