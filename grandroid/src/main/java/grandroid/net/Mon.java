@@ -5,6 +5,7 @@
 package grandroid.net;
 
 import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,6 +62,8 @@ public class Mon {
      */
     protected int method;
 
+    protected String contentType;
+
     /**
      *
      */
@@ -81,8 +85,11 @@ public class Mon {
      */
     public static final int DELETE = 3;
 
+    public static final String CONTENT_TYPE_FORM_URLENCODED = "application/x-www-form-urlencoded";
+
+    public static final String CONTENT_TYPE_JSON = "application/json";
+
     /**
-     *
      * @param uri 欲擷取資料的URL
      */
     public Mon(String uri) {
@@ -90,7 +97,6 @@ public class Mon {
     }
 
     /**
-     *
      * @param uri 欲擷取資料的URL
      */
     public Mon(String uri, boolean keepCookie) {
@@ -101,10 +107,10 @@ public class Mon {
         headerParams = new HashMap<String, String>();
         method = 0;//default use POST
         this.keepingCookie = keepCookie;
+        contentType = CONTENT_TYPE_FORM_URLENCODED;
     }
 
     /**
-     *
      * @return
      */
     protected Mon getLoginMon() {
@@ -112,7 +118,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public Mon asLoginConnection() {
@@ -121,7 +126,6 @@ public class Mon {
     }
 
     /**
-     *
      * @param result
      * @return
      */
@@ -130,7 +134,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public boolean isKeepingCookie() {
@@ -138,7 +141,6 @@ public class Mon {
     }
 
     /**
-     *
      * @param keepingCookie
      */
     public Mon setKeepingCookie(boolean keepingCookie) {
@@ -156,7 +158,6 @@ public class Mon {
     }
 
     /**
-     *
      * @param encoding
      * @return
      */
@@ -168,7 +169,7 @@ public class Mon {
     /**
      * 新增一組傳輸參數
      *
-     * @param key 參數的名字
+     * @param key   參數的名字
      * @param value 參數值
      * @return Mon物件本身，方便串接
      */
@@ -228,14 +229,26 @@ public class Mon {
 
     public String getParameters(boolean encode) {
         StringBuilder sb = new StringBuilder();
-        for (String key : param.keySet()) {
-            if (sb.length() != 0) {
-                sb.append("&");
+        if (contentType.equals(CONTENT_TYPE_JSON)){
+            JSONObject jo=new JSONObject();
+            for (String key : param.keySet()) {
+                try {
+                    jo.put(key,param.get(key));
+                } catch (JSONException e) {
+                    Log.e("grandroid", null, e);
+                }
             }
-            try {
-                sb.append(key).append("=").append(encode ? URLEncoder.encode(param.get(key).replaceAll("\\\\/", "/"), "UTF-8") : param.get(key));
-            } catch (UnsupportedEncodingException ex) {
-                Log.e("grandroid", null, ex);
+            sb.append(jo.toString());
+        }else {
+            for (String key : param.keySet()) {
+                if (sb.length() != 0) {
+                    sb.append("&");
+                }
+                try {
+                    sb.append(key).append("=").append(encode ? URLEncoder.encode(param.get(key).replaceAll("\\\\/", "/"), "UTF-8") : param.get(key));
+                } catch (UnsupportedEncodingException ex) {
+                    Log.e("grandroid", null, ex);
+                }
             }
         }
         return sb.toString();
@@ -304,7 +317,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public Mon asPost() {
@@ -313,7 +325,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public Mon asGet() {
@@ -322,7 +333,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public Mon asPut() {
@@ -331,11 +341,15 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public Mon asDelete() {
         method = 3;
+        return this;
+    }
+
+    public Mon contentJSON(){
+        contentType=CONTENT_TYPE_JSON;
         return this;
     }
 
@@ -468,7 +482,6 @@ public class Mon {
     }
 
     /**
-     *
      * @return
      */
     public static String getCookie() {
@@ -476,7 +489,6 @@ public class Mon {
     }
 
     /**
-     *
      * @param connection
      */
     protected void extractCookie(HttpURLConnection connection) {
