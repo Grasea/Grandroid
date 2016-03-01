@@ -24,7 +24,7 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
 }
 def siteUrl = 'https://github.com/Grasea/Grandroid'      // 项目的主页
 def gitUrl = 'https://github.com/Grasea/Grandroid.git'   // Git 仓库的 url
