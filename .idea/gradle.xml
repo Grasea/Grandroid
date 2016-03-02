@@ -17,6 +17,16 @@
             <option value="$PROJECT_DIR$/sample-grangeo" />
           </set>
         </option>
+        <option name="myModules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/grandroid" />
+            <option value="$PROJECT_DIR$/grandroid-database" />
+            <option value="$PROJECT_DIR$/grangeo" />
+            <option value="$PROJECT_DIR$/sample-grandroid" />
+            <option value="$PROJECT_DIR$/sample-grangeo" />
+          </set>
+        </option>
       </GradleProjectSettings>
     </option>
   </component>
