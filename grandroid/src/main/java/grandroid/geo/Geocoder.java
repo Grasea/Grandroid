@@ -82,8 +82,8 @@ public class Geocoder {
         HttpGet httpGet = new HttpGet(address);
         HttpClient client = new DefaultHttpClient();
         client.getParams().setParameter(AllClientPNames.USER_AGENT, "Mozilla/5.0 (Java) Gecko/20081007 java-geocoder");
-        client.getParams().setIntParameter(AllClientPNames.CONNECTION_TIMEOUT, 5 * 1000);
-        client.getParams().setIntParameter(AllClientPNames.SO_TIMEOUT, 25 * 1000);
+        //client.getParams().setIntParameter(AllClientPNames.CONNECTION_TIMEOUT, 5 * 1000);
+        //client.getParams().setIntParameter(AllClientPNames.SO_TIMEOUT, 25 * 1000);
         HttpResponse response;
 
         List<Address> retList = null;
