@@ -3,12 +3,12 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 version = "1.0.0"
 android {
-    compileSdkVersion 23
+    compileSdkVersion 22
     buildToolsVersion "23.0.2"
 
     defaultConfig {
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 17
         versionCode 1
         versionName "1.0"
     }
@@ -21,12 +21,13 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile project(':grandroid')
     compile 'com.google.android.gms:play-services-maps:8.4.0'
+    compile 'com.google.android.gms:play-services-location:8.4.0'
 }
-def siteUrl = 'https://github.com/Grasea/Grangeo'      // 项目的主页
-def gitUrl = 'https://github.com/Grasea/Grangeo.git'   // Git 仓库的 url
+def siteUrl = 'https://github.com/Grasea/Grandroid'      // 项目的主页
+def gitUrl = 'https://github.com/Grasea/Grandroid.git'   // Git 仓库的 url
 
 group = "com.grasea"
 
@@ -38,7 +39,7 @@ install {
             packaging 'aar'
             // Add your description here
             name 'Android Location of open source Libraray'    // 项目描述
-            url 'https://github.com/Grasea/Grangeo'
+            url 'https://github.com/Grasea/Grandroid'
             // Set your license
             licenses {
                 license {
