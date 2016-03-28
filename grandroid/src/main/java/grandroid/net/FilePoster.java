@@ -7,6 +7,7 @@ package grandroid.net;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -17,7 +18,6 @@ import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
 
 /**
- *
  * @author Rovers
  */
 public class FilePoster {
@@ -60,7 +60,6 @@ public class FilePoster {
     }
 
     /**
-     *
      * @param url
      * @param file
      * @return
@@ -71,7 +70,6 @@ public class FilePoster {
     }
 
     /**
-     *
      * @param url
      * @param file
      * @param col
@@ -115,7 +113,7 @@ public class FilePoster {
         //System.out.println(response.getStatusLine());
         String responseText = "";
         if (resEntity != null) {
-            responseText = EntityUtils.toString(resEntity);
+            responseText = EntityUtils.toString(resEntity, "UTF-8");
         }
         if (resEntity != null) {
             resEntity.consumeContent();

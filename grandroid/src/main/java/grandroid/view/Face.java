@@ -348,7 +348,7 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
 //        });
     }
 
-    protected Fragment getLastFragment() {
+    public Fragment getLastFragment() {
         FragmentManager fm = this.getSupportFragmentManager();
         if (fm.getFragments() != null) {
             for (int i = fm.getFragments().size() - 1; i >= 0; i--) {

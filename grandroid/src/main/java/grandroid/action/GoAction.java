@@ -14,15 +14,16 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+
 import grandroid.activity.ComponentActivity;
 import grandroid.app.AppStatus;
 import grandroid.view.Face;
 import grandroid.view.R;
 import grandroid.view.fragment.Component;
+
 import java.util.List;
 
 /**
- *
  * @author Rovers
  */
 public class GoAction extends ContextAction {
@@ -56,6 +57,8 @@ public class GoAction extends ContextAction {
     protected boolean beforeAnchor;
     protected int leaveTransition;
     protected int enterTransition;
+    protected int popEnterTransition;
+    protected int popLeaveTransition;
 
     public enum Direction {
 
@@ -63,9 +66,8 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
-     * @param c target activity
+     * @param c       target activity
      */
     public GoAction(Context context, Class c) {
         super(context, "undefined");
@@ -73,7 +75,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
      * @param actionName
      * @param cp
@@ -88,7 +89,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
      * @param actionName
      * @param c
@@ -117,7 +117,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param bundle
      * @return
      */
@@ -127,7 +126,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -141,7 +139,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -155,7 +152,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -169,7 +165,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param strarr
      * @return
@@ -183,7 +178,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param intarr
      * @return
@@ -197,7 +191,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -220,34 +213,41 @@ public class GoAction extends ContextAction {
         switch (dir) {
             case Left:
                 leaveTransition = R.anim.slide_in_left;
-                enterTransition = R.anim.slide_in_right;
+                enterTransition = R.anim.slide_out_right;
+                popEnterTransition = R.anim.slide_in_right;
+                popLeaveTransition = R.anim.slide_out_left;
                 break;
             case Left_Only:
                 leaveTransition = R.anim.no_animation;
                 enterTransition = R.anim.slide_in_right;
                 break;
             case Right:
-                leaveTransition = R.anim.slide_in_right;
-                enterTransition = R.anim.slide_in_left;
+                leaveTransition = R.anim.slide_out_left;
+                enterTransition = R.anim.slide_in_right;
+                popEnterTransition = R.anim.slide_in_left;
+                popLeaveTransition = R.anim.slide_out_right;
                 break;
             case Up:
-                leaveTransition = R.anim.slide_in_up;
+                leaveTransition = R.anim.slide_out_up;
                 enterTransition = R.anim.slide_in_bottom;
+                popEnterTransition = R.anim.slide_in_up;
+                popLeaveTransition = R.anim.slide_out_bottom;
                 break;
             case Up_Only:
                 leaveTransition = R.anim.no_animation;
                 enterTransition = R.anim.slide_in_bottom;
                 break;
             case Down:
-                leaveTransition = R.anim.slide_in_bottom;
-                enterTransition = R.anim.slide_in_up;
+                leaveTransition = R.anim.slide_out_up;
+                enterTransition = R.anim.slide_in_bottom;
+                popEnterTransition = R.anim.slide_in_up;
+                popLeaveTransition = R.anim.slide_out_bottom;
                 break;
         }
         return this;
     }
 
     /**
-     *
      * @param flag
      * @return
      */
@@ -285,7 +285,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction forgetCurrentFace() {
@@ -299,7 +298,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction removeOldFace() {
@@ -307,7 +305,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction setSubTask() {
@@ -315,7 +312,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param requestCode
      * @return
      */
@@ -341,7 +337,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
      * @return
      */
@@ -374,8 +369,8 @@ public class GoAction extends ContextAction {
                         }
                     }
                     FragmentTransaction ft = fm.beginTransaction();
-                    if (enterTransition != 0 && leaveTransition != 0) {
-                        ft.setCustomAnimations(enterTransition, leaveTransition);
+                    if (enterTransition != 0 && leaveTransition != 0 && popEnterTransition != 0 && popLeaveTransition != 0) {
+                        ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
                     }
                     try {
                         Fragment f = (Fragment) Component.createInstance(c);
@@ -387,7 +382,10 @@ public class GoAction extends ContextAction {
                                 ((Component) f).setForgottenState(1);
                             }
                         }
-                        ft.replace(container, f, c.getSimpleName());
+                        if (((Face) context).getLastFragment() != null) {
+                            ft.hide(((Face) context).getLastFragment());
+                        }
+                        ft.add(container, f, c.getSimpleName());
                         //if (!forgetCurrent) {
                         if (fm.getFragments() != null && hasRecoverableFragment(fm)) {//
                             ft.addToBackStack(c.getSimpleName());
