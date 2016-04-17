@@ -14,15 +14,16 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+
 import grandroid.activity.ComponentActivity;
 import grandroid.app.AppStatus;
 import grandroid.view.Face;
 import grandroid.view.R;
 import grandroid.view.fragment.Component;
+
 import java.util.List;
 
 /**
- *
  * @author Rovers
  */
 public class GoAction extends ContextAction {
@@ -56,6 +57,8 @@ public class GoAction extends ContextAction {
     protected boolean beforeAnchor;
     protected int leaveTransition;
     protected int enterTransition;
+    protected int popEnterTransition;
+    protected int popLeaveTransition;
 
     public enum Direction {
 
@@ -63,9 +66,8 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
-     * @param c target activity
+     * @param c       target activity
      */
     public GoAction(Context context, Class c) {
         super(context, "undefined");
@@ -73,7 +75,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
      * @param actionName
      * @param cp
@@ -88,7 +89,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param context
      * @param actionName
      * @param c
@@ -117,7 +117,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param bundle
      * @return
      */
@@ -127,7 +126,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -141,7 +139,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -155,7 +152,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -169,7 +165,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param strarr
      * @return
@@ -183,7 +178,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param intarr
      * @return
@@ -197,7 +191,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param key
      * @param value
      * @return
@@ -220,34 +213,41 @@ public class GoAction extends ContextAction {
         switch (dir) {
             case Left:
                 leaveTransition = R.anim.slide_in_left;
-                enterTransition = R.anim.slide_in_right;
+                enterTransition = R.anim.slide_out_right;
+                popEnterTransition = R.anim.slide_in_right;
+                popLeaveTransition = R.anim.slide_out_left;
                 break;
             case Left_Only:
                 leaveTransition = R.anim.no_animation;
                 enterTransition = R.anim.slide_in_right;
                 break;
             case Right:
-                leaveTransition = R.anim.slide_in_right;
-                enterTransition = R.anim.slide_in_left;
+                leaveTransition = R.anim.slide_out_left;
+                enterTransition = R.anim.slide_in_right;
+                popEnterTransition = R.anim.slide_in_left;
+                popLeaveTransition = R.anim.slide_out_right;
                 break;
             case Up:
-                leaveTransition = R.anim.slide_in_up;
+                leaveTransition = R.anim.slide_out_up;
                 enterTransition = R.anim.slide_in_bottom;
+                popEnterTransition = R.anim.slide_in_up;
+                popLeaveTransition = R.anim.slide_out_bottom;
                 break;
             case Up_Only:
                 leaveTransition = R.anim.no_animation;
                 enterTransition = R.anim.slide_in_bottom;
                 break;
             case Down:
-                leaveTransition = R.anim.slide_in_bottom;
-                enterTransition = R.anim.slide_in_up;
+                leaveTransition = R.anim.slide_out_up;
+                enterTransition = R.anim.slide_in_bottom;
+                popEnterTransition = R.anim.slide_in_up;
+                popLeaveTransition = R.anim.slide_out_bottom;
                 break;
         }
         return this;
     }
 
     /**
-     *
      * @param flag
      * @return
      */
@@ -285,7 +285,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction forgetCurrentFace() {
@@ -299,7 +298,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction removeOldFace() {
@@ -307,7 +305,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @return
      */
     public GoAction setSubTask() {
@@ -315,7 +312,6 @@ public class GoAction extends ContextAction {
     }
 
     /**
-     *
      * @param requestCode
      * @return
      */
@@ -340,8 +336,8 @@ public class GoAction extends ContextAction {
         return this;
     }
 
+
     /**
-     *
      * @param context
      * @return
      */
@@ -350,55 +346,86 @@ public class GoAction extends ContextAction {
         if (context != null && c != null) {
             if (Fragment.class.isAssignableFrom(c)) {
                 if (container > 0) {
-                    final FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
-                    try {
-                        if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP) {
-                            fm.popBackStack(c.getSimpleName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                        }
-                        if (anchorClass != null) {
-                            int anchorIndex = findAnchorTag(fm);
-                            if (anchorIndex >= 0) {
-                                fm.popBackStack(anchorIndex, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                            }
-                            if (beforeAnchor) {
-                                fm.popBackStack();
-                            }
-                        }
-                    } catch (Exception ex) {
-                        Log.e("grandroid", null, ex);
+                    Face face = ((Face) context);
+                    face.prepareTurnToFragment();
+                    android.support.v4.app.FragmentManager fm = face.getSupportFragmentManager();
+                    Fragment fragment = fm.findFragmentByTag(c.getSimpleName());
+                    boolean isFragmentExist = fragment != null;
+//                    if (fragment == null) {
+                    Component lastComponent = face.getLastComponent();
+                    if (isFragmentExist) {
+                        Log.i("grandroid", "lastComponent:" + lastComponent.getClass().getSimpleName() + ", new Component:" + c.getSimpleName());
                     }
-                    Fragment leavingFragment = findLastFragment(fm);
-                    if (leavingFragment instanceof Component) {
-                        if (((Component) leavingFragment).getForgottenState() == 1) {
-                            ((Component) leavingFragment).setForgottenState(2);
+                    if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP && isFragmentExist
+                            && lastComponent.getClass().getSimpleName().equals(c.getSimpleName())) {
+                    } else {
+                        try {
+//                        isFragmentExist = false;
+                            fragment = (Fragment) Component.createInstance(c);
+                            fragment.setArguments(new Bundle());
+                        } catch (Exception e) {
+                            Log.e("grandroid", null, e);
                         }
+                    }
+
+//                    }
+
+//                    if (fragment.isAdded()) {
+//
+//                        return true;
+//                    }
+                    if (bundle != null && !bundle.isEmpty()) {
+                        fragment.getArguments().putAll(bundle);
                     }
                     FragmentTransaction ft = fm.beginTransaction();
-                    if (enterTransition != 0 && leaveTransition != 0) {
-                        ft.setCustomAnimations(enterTransition, leaveTransition);
-                    }
-                    try {
-                        Fragment f = (Fragment) Component.createInstance(c);
-                        if (bundle != null) {
-                            f.setArguments(bundle);
-                        }
-                        if (forgetCurrent) {
-                            if (f instanceof Component) {
-                                ((Component) f).setForgottenState(1);
+//        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+//                R.anim.slide_in_right, R.anim.slide_out_left);
+                    if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP) {
+                        if (lastComponent != null && lastComponent.getClass().getSimpleName().equals(c.getSimpleName())) {
+                            lastComponent.onResume();
+                        } else {
+                            if (!isFragmentExist && enterTransition != 0 && leaveTransition != 0 && popEnterTransition != 0 && popLeaveTransition != 0) {
+                                ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
+                            }
+                            if (lastComponent != null) {
+                                Log.e("grandroid", "Clear Top & Hide Component:" + lastComponent.getClass().getSimpleName());
+                                ft.hide(lastComponent);
+                            } else {
+                                Log.e("grandroid", "Clear Top getLastFragment is null");
+                            }
+                            if (isFragmentExist) {
+                                fm.popBackStack(c.getSimpleName(), 0);
+                                face.resetBackStackSet();
+                                Log.e("grandroid", "Clear Top & popBackStack:" + c.getSimpleName());
+                            } else {
+                                ft.add(container, fragment, c.getSimpleName());
+                                ft.addToBackStack(c.getSimpleName());
+                                Log.e("grandroid", "Clear Top & add new Component:" + c.getSimpleName());
                             }
                         }
-                        ft.replace(container, f, c.getSimpleName());
-                        //if (!forgetCurrent) {
-                        if (fm.getFragments() != null && hasRecoverableFragment(fm)) {//
-                            ft.addToBackStack(c.getSimpleName());
-                            Log.d("grandroid", "addToBackStack: " + c.getSimpleName());
-                            //}else{
-                            //    Log.d("grandroid", "not addToBackStack: " + c.getSimpleName());
+
+                    } else {
+                        if (enterTransition != 0 && leaveTransition != 0 && popEnterTransition != 0 && popLeaveTransition != 0) {
+                            ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
                         }
-                        //}
-                        ft.commit();
-                    } catch (Exception ex) {
-                        Log.e("grandroid", null, ex);
+                        if (lastComponent != null) {
+                            Log.e("grandroid", "Hide Component:" + lastComponent.getClass().getSimpleName());
+                            ft.hide(lastComponent);
+                        }
+
+                        if (isFragmentExist) {
+                            ft.add(container, fragment, c.getSimpleName());
+                            ft.addToBackStack(c.getSimpleName());
+                            Log.e("grandroid", "addToBackStack & Component is Exist:" + c.getSimpleName());
+                        } else {
+                            ft.add(container, fragment, c.getSimpleName());
+                            ft.addToBackStack(c.getSimpleName());
+                            Log.e("grandroid", "addToBackStack & Component is NOT Exist:" + c.getSimpleName());
+                        }
+                    }
+                    ft.commit();
+                    if (forgetCurrent) {
+                        face.addComponentToBackStack(1);
                     }
                 } else {
                     Intent intent = new Intent();

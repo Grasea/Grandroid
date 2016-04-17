@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
-version = "1.0.8-beta3"
+version = "1.0.8-beta8"
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
@@ -32,9 +32,9 @@ dependencies {
     //compile fileTree(dir: 'libs', include: ['*.jar'])
     //compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.android.support:support-v4:23.0.+'
-    compile 'com.google.android.gms:play-services-ads:8.3.0'
-    compile 'com.google.android.gms:play-services-auth:8.3.0'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.google.android.gms:play-services-ads:8.4.0'
+    compile 'com.google.android.gms:play-services-auth:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
 }
 
 def siteUrl = 'https://github.com/Grasea/Grandroid'      // 项目的主页

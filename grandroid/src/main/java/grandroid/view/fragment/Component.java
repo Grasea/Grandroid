@@ -13,11 +13,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+
 import grandroid.action.Action;
 import grandroid.data.DataAgent;
 import grandroid.dialog.CommandPickModel;
 import grandroid.view.Face;
 import grandroid.view.LayoutMaker;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Observable;
@@ -26,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- *
  * @author Rovers
  */
 public class Component extends Fragment implements Observer {
@@ -59,7 +60,6 @@ public class Component extends Fragment implements Observer {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        container.removeAllViews();
         if (rootView == null) {
             LayoutMaker maker = createLayoutMaker();
             onCreateView(maker, savedInstanceState);
@@ -135,9 +135,6 @@ public class Component extends Fragment implements Observer {
             }
             //watchKeys.clear();
         }
-        if (rootView != null) {
-            ((ViewGroup) rootView.getParent()).removeView(rootView);
-        }
         super.onDestroyView(); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -171,7 +168,7 @@ public class Component extends Fragment implements Observer {
             IllegalArgumentException, java.lang.InstantiationException, IllegalAccessException, InvocationTargetException {
 
         T instanceToReturn = null;
-        Class< ?> enclosingClass = clazz.getEnclosingClass();
+        Class<?> enclosingClass = clazz.getEnclosingClass();
 
         if (enclosingClass != null) {
             Object instanceOfEnclosingClass = createInstance(enclosingClass);
@@ -205,7 +202,6 @@ public class Component extends Fragment implements Observer {
     }
 
     /**
-     *
      * @param <T>
      * @param cpm
      */
@@ -227,5 +223,12 @@ public class Component extends Fragment implements Observer {
 
     public boolean onBackPressed() {
         return true;
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("grandroid", getClass().getSimpleName() + " onResume");
     }
 }

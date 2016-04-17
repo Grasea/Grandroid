@@ -2,90 +2,129 @@ package grandroid.sample;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Observable;
+import java.util.Observer;
 
 import grandroid.action.AsyncAction;
+import grandroid.action.GoAction;
 import grandroid.action.ToastAction;
 import grandroid.net.FilePoster;
+import grandroid.net.Mon;
 import grandroid.view.Face;
+import grandroid.view.fragment.DataEvent;
 
-public class MainActivity extends Face {
+public class MainActivity extends Face implements Observer, View.OnClickListener {
+    UISetting currentUISetting;
+    TextView titleBar;
+    Button btn1, btn2, btn3,btn4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        new AsyncAction<File>(this) {
-            @Override
-            public boolean execute(Context context) {
-                InputStream inputStream = null;
-                OutputStream outputStream = null;
-                File result = new File(getExternalFilesDir(null).getPath() + "/userfile.xml");
-                try {
-                    inputStream = getAssets().open("userfile.xml");
-                    outputStream =
-                            new FileOutputStream(result);
-                    int read = 0;
-                    byte[] bytes = new byte[1024];
+        titleBar = (TextView) findViewById(R.id.title);
+        btn1 = (Button) findViewById(R.id.btn1);
+        btn1.setOnClickListener(this);
 
-                    while ((read = inputStream.read(bytes)) != -1) {
-                        outputStream.write(bytes, 0, read);
-                    }
+        btn2 = (Button) findViewById(R.id.btn2);
+        btn2.setOnClickListener(this);
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    if (inputStream != null) {
-                        try {
-                            inputStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (outputStream != null) {
-                        try {
-                            // outputStream.flush();
-                            outputStream.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+        btn3 = (Button) findViewById(R.id.btn3);
+        btn3.setOnClickListener(this);
 
-                    }
+        btn4 = (Button) findViewById(R.id.btn4);
+        btn4.setOnClickListener(this);
+        new GoAction(this, ComponentTest1.class, R.id.frame).goDirection(GoAction.Direction.Right).execute();
+        registerDataEvent("UI_CHANGE", this);
+    }
+
+    public synchronized void update(Observable observable, Object data) {
+        DataEvent de = (DataEvent) data;
+        if (de.getKey().equals("UI_CHANGE")) {
+            UISetting setting = (UISetting) de.getData();
+            if (currentUISetting == null) {
+                //產生一個完全相反的UISetting，為的是讓下面的UI設定全都執行
+                currentUISetting = new UISetting(!setting.showTitleBar, "");
+            }
+            if (currentUISetting.showTitleBar != setting.showTitleBar) {
+                if (setting.showTitleBar) {
+                    titleBar.setVisibility(View.VISIBLE);
+                } else {
+                    titleBar.setVisibility(View.GONE);
                 }
-                setResult(result);
-                return true;
+            }
+            if (setting.title != null) {
+                titleBar.setText(setting.title);
+                if(setting.title.equals("Title:Page1")){
+                    btn1.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                    btn2.setTextColor(getResources().getColor(android.R.color.black));
+                    btn3.setTextColor(getResources().getColor(android.R.color.black));
+                    btn4.setTextColor(getResources().getColor(android.R.color.black));
+                }else  if(setting.title.equals("Title:Page2")){
+                    btn1.setTextColor(getResources().getColor(android.R.color.black));
+                    btn2.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                    btn3.setTextColor(getResources().getColor(android.R.color.black));
+                    btn4.setTextColor(getResources().getColor(android.R.color.black));
+                }else  if(setting.title.equals("Title:Page3")){
+                    btn1.setTextColor(getResources().getColor(android.R.color.black));
+                    btn2.setTextColor(getResources().getColor(android.R.color.black));
+                    btn3.setTextColor(getResources().getColor(android.R.color.darker_gray));
+                    btn4.setTextColor(getResources().getColor(android.R.color.black));
+                }else  if(setting.title.equals("Title:Page4")){
+                    btn1.setTextColor(getResources().getColor(android.R.color.black));
+                    btn2.setTextColor(getResources().getColor(android.R.color.black));
+                    btn3.setTextColor(getResources().getColor(android.R.color.black));
+                    btn4.setTextColor(getResources().getColor(android.R.color.darker_gray));
+
+                }
             }
 
-            @Override
-            public void afterExecution(final File file) {
-                new AsyncAction<String>(context) {
-                    @Override
-                    public boolean execute(Context context) {
-                        FilePoster fp = new FilePoster();
-                        fp.put("Key", "83B955B96CFD925EEB83DF2290CCA5C3A6325EECA5DCA1C6896B3F4D211892AB78CD4CA76F3D4D5B7485F74D5804D1A76C33D4A2D4303B32464BC299BAD14957AE2CBC");
-                        fp.setPostParamName("userfile");
-                        try {
-                            setResult(fp.post("http://www.broadfast.com.tw/BroadFast/AgentQueryCategory2.php", file));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        return true;
-                    }
+//            if (setting.funcButton != null) {
+//                if (setting.funcButton.getParent() != null) {
+//                    ((ViewGroup) setting.funcButton.getParent()).removeView(setting.funcButton);
+//                }
+//                frameTitleBar.addView(setting.funcButton, maker.layFrameAbsolute(0, 0, setting.getFuncW(), setting.getFuncH(), Gravity.RIGHT | Gravity.CENTER));
+//                this.btnFunc = setting.funcButton;
+//            }
+            currentUISetting = setting;
+        }
 
-                    @Override
-                    public void afterExecution(String result) {
-                        new ToastAction(context).setMessage(result).execute();
-                    }
-                }.execute();
+    }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn1:
+                new GoAction(this, ComponentTest1.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
+                break;
+            case R.id.btn2:
+                new GoAction(this, ComponentTest2.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
+                break;
+            case R.id.btn3:
+                new GoAction(this, ComponentTest3.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
+                break;
+            case R.id.btn4:
+                new GoAction(this, ComponentTest4.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
+                break;
+        }
+    }
 
-            }
-        }.execute();
+    public static class UISetting {
+        public boolean showTitleBar = true;
+        public String title = "";
 
+        public UISetting(boolean showTitleBar, String title) {
+            this.showTitleBar = showTitleBar;
+            this.title = title;
+        }
     }
 }

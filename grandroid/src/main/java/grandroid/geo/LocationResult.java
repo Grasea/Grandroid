@@ -8,7 +8,6 @@ package grandroid.geo;
 import android.location.Location;
 
 /**
- *
  * @author Rovers
  */
 public abstract class LocationResult {
@@ -41,6 +40,11 @@ public abstract class LocationResult {
         return this;
     }
 
+    /**
+     * 如要定時追蹤，需先呼叫此方法
+     *
+     * @return
+     */
     public LocationResult follow() {
         this.maxCount = Integer.MAX_VALUE;
         return this;
@@ -54,5 +58,5 @@ public abstract class LocationResult {
 
     public void onNoDeviceSupport() {
     }
-    
+
 }

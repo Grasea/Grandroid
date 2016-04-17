@@ -33,6 +33,7 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener,
         ResultCallback<LocationSettingsResult> {
+    public static final long INTERVAL = 10000;
     /**
      * Provides the entry point to Google Play services.
      */
@@ -50,31 +51,53 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
     protected LocationSettingsRequest mLocationSettingsRequest;
     protected boolean connected;
     protected List<LocationResult> callbacks;//採用Observer Pattern
-    protected long maxWaiting;
-    protected long maxTimeout;
-    protected long interval;
+    protected long interval = 0;//接收位置的間隔時間
+    /**
+     * 通过 LocationRequest.setFastestInterval() 设置。这一方法设置的是你的应用能处理更新的最快间隔时间
+     * ，以毫秒为单位。你需要设置这个频率是因为其它应用也会影响位置更新非频率。
+     * 定位服务会以所有应用通过 LocationRequest.setInterval() 设置的最快的间隔时间来发送更新。
+     * 如果这一频率比你的应用能够处理的频率要快，那么你可能会遇到 UI 闪烁或数据溢出等问题。
+     * 为了避免这一情况发生，应该调用 LocationRequest.setFastestInterval() 这一方法设置更新频率的最高限额。
+     */
+    protected long fastestInterval = 1;//App最快能處理位置更新的間格時間
+
     protected Context context;
-    protected boolean locateAfterConnected;
+//    protected boolean locateAfterConnected;
 
     public GeoLocator(Context context) {
         this.context = context;
-        this.maxWaiting = maxWaiting;
-        this.maxTimeout = 5000;
+        interval = INTERVAL;
         mGoogleApiClient = new GoogleApiClient.Builder(context)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+        mLocationRequest = new LocationRequest();
         callbacks = new CopyOnWriteArrayList<LocationResult>();
+    }
+
+    public void setInterval(long interval) {
+        this.interval = interval;
+        mLocationRequest.setInterval(interval);
     }
 
     public long getInterval() {
         return interval;
     }
 
+    public long getFastestInterval() {
+        return fastestInterval;
+    }
+
+    public void setFastestInterval(long fastestInterval) {
+        this.fastestInterval = fastestInterval;
+        mLocationRequest.setFastestInterval(fastestInterval);
+    }
+
+
     public Location getLastLocation() {
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+        if (isConnected() && permissionCheck == PackageManager.PERMISSION_GRANTED) {
             return LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         } else {
             return null;
@@ -88,19 +111,12 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
     public void start() {
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(
-                    mGoogleApiClient,
-                    mLocationRequest,
-                    this
-            ).setResultCallback(new ResultCallback<Status>() {
-                @Override
-                public void onResult(Status status) {
-                    connected = true;
-                    if(!callbacks.isEmpty()) {
-                        locateAfterConnected = true;
-                    }
-                }
-            });
+            mGoogleApiClient.connect();
+        } else {
+            for (int i = 0; i < callbacks.size(); i++) {
+                LocationResult callback = callbacks.get(i);
+                callback.onNoDeviceSupport();
+            }
         }
 
     }
@@ -200,17 +216,39 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
      */
 
     public void onConnected(Bundle bundle) {
-        if (locateAfterConnected) {
-            int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-            }
-/*            if (interval == 0) {
+//        if (locateAfterConnected) {
+//            int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+//            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+        connected = true;
+        try {
+            mLocationRequest.setInterval(getInterval()).setFastestInterval(getFastestInterval());
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient,
+                    mLocationRequest,
+                    this
+            ).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(Status status) {
+                    if (status != null) {
+                        Log.i("grandroid", status.getStatusCode() + "/" + status.getStatus());
+                    }
+                    if (callbacks.isEmpty()) {
+                        Log.e("grandroid", "callbacks is Empty. Stop to request location update.");
+                        stop();
+                    }
+                }
+            });
+        } catch (Exception e) {
+            Log.e("grandroid", "取得位置或地址失敗", e);
+        }
+//                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+//            }
+/*         \   if (interval == 0) {
                 locateCustom(LocationRequest.create().setInterval(0), listener);
             } else {
                 locateCustom(LocationRequest.create().setInterval(interval), listener);
             }*/
-        }
+//        }
     }
 
     @Override
@@ -219,6 +257,7 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void onDisconnected() {
+        connected = false;
     }
 
     public void onConnectionFailed(ConnectionResult cr) {
@@ -227,10 +266,11 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onLocationChanged(Location location) {
+        Log.e("grandroid", "On Location Changed.");
         for (int i = callbacks.size() - 1; i >= 0; i--) {
             LocationResult result = callbacks.get(i);
-            boolean keep = result.gotLocation(location);
             result.used();
+            boolean keep = result.gotLocation(location);
             if (!keep || result.isExceedCount()) { //有任何一個callback回傳false
                 //移除該callback
                 callbacks.remove(i);
@@ -245,6 +285,5 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
 
     @Override
     public void onResult(LocationSettingsResult locationSettingsResult) {
-
     }
 }
