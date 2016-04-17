@@ -32,6 +32,7 @@ public class GeoLocatorTestActivity extends AppCompatActivity {
                 return true;
             }
         };
+        //持續追蹤
         locationResult.follow();
         geoLocator.addLocatingJob(locationResult);
         geoLocator.start();
