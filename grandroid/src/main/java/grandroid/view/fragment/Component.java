@@ -31,6 +31,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @author Rovers
  */
 public class Component extends Fragment implements Observer {
+    protected Bundle savedInstanceState;
 
     protected DataEventHandler eh;
     protected CopyOnWriteArrayList<String> watchKeys;
@@ -60,6 +61,7 @@ public class Component extends Fragment implements Observer {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        this.savedInstanceState = savedInstanceState;
         if (rootView == null) {
             LayoutMaker maker = createLayoutMaker();
             onCreateView(maker, savedInstanceState);
