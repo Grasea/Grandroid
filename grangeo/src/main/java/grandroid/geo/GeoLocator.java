@@ -261,7 +261,7 @@ public class GeoLocator implements GoogleApiClient.ConnectionCallbacks,
     }
 
     public void onConnectionFailed(ConnectionResult cr) {
-        Log.e("grandroid", "error while connect to google map serivce: " + cr.toString());
+        Log.e("grandroid", "error while connect to google mapView serivce: " + cr.toString());
     }
 
     @Override

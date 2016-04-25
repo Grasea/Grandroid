@@ -10,12 +10,15 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
@@ -33,13 +36,13 @@ import grandroid.action.AsyncAction;
 import grandroid.database.FaceData;
 
 /**
- *
  * @author Rovers
  */
 public final class MapManager {
 
     public String defaultLayerName = "default";
     protected MapView mapView;
+    protected GoogleMap map;
     protected Location pos;
     protected GeoLocator locator;
     protected FaceData fd;
@@ -70,29 +73,51 @@ public final class MapManager {
         }
     }
 
-    public MapManager(Context context, MapView mapView) {
+    public MapManager(Context context, MapView mapView, final OnMapReadyCallback onMapReadyCallback) {
+        MapsInitializer.initialize(context);
+
         this.mapView = mapView;
         pos = null;
         lm = new LayerManager(mapView);
         locator = new GeoLocator(context);
         changeLayer(defaultLayerName);
+        this.mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+                if (onMapReadyCallback != null) {
+                    onMapReadyCallback.onMapReady(googleMap);
+                }
+            }
+        });
     }
 
-    public MapManager(Activity activity, Bundle savedInstanceState) {
+    public MapManager(Activity activity, Bundle savedInstanceState, final OnMapReadyCallback onMapReadyCallback) {
+        MapsInitializer.initialize(activity);
+        locator = new GeoLocator(activity);
+
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(getLastPosition())
                 .zoom(16)
                 .build();
         mapView = new MapView(activity, new GoogleMapOptions().camera(cameraPosition));
         mapView.onCreate(savedInstanceState);
+        mapView.onResume();
+        mapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                map = googleMap;
+                if (onMapReadyCallback != null) {
+                    onMapReadyCallback.onMapReady(googleMap);
+                }
+            }
+        });
         pos = null;
         lm = new LayerManager(mapView);
-        locator = new GeoLocator(activity);
         changeLayer(defaultLayerName);
 
         //try {
-        MapsInitializer.initialize(activity);
-        //map.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(getDefaultPosition(), getDefaultZoom()));
+        //mapView.getMapView().animateCamera(CameraUpdateFactory.newLatLngZoom(getDefaultPosition(), getDefaultZoom()));
         //} catch (GooglePlayServicesNotAvailableException ex) {
         //    Log.e("grandroid", null, ex);
         //}
@@ -110,28 +135,32 @@ public final class MapManager {
         return mapView;
     }
 
+    public GoogleMap getMap() {
+        return map;
+    }
+
     public GeoLocator getLocator() {
         return locator;
     }
 
     public LatLng getCenter() {
-        return mapView.getMap().getCameraPosition().target;
+        return map.getCameraPosition().target;
     }
 
     public void setCenter(LatLng pos) {
-        mapView.getMap().moveCamera(CameraUpdateFactory.newLatLng(pos));
+        map.moveCamera(CameraUpdateFactory.newLatLng(pos));
     }
 
     public float getZoom() {
-        return mapView.getMap().getCameraPosition().zoom;
+        return map.getCameraPosition().zoom;
     }
 
     public void setZoom(float zoom) {
-        mapView.getMap().moveCamera(CameraUpdateFactory.zoomTo(zoom));
+        map.moveCamera(CameraUpdateFactory.zoomTo(zoom));
     }
 
     public void setMarkerListener(GoogleMap.OnMarkerClickListener markerClickListener) {
-        mapView.getMap().setOnMarkerClickListener(markerClickListener);
+        map.setOnMarkerClickListener(markerClickListener);
     }
 
     public Layer changeLayer(String name) {
@@ -152,7 +181,7 @@ public final class MapManager {
             }
         }
 
-        pos = GPSUtil.getLastPosition(mapView.getContext());
+        pos = locator.getLastLocation();
         if (pos == null) {
             currPos = new LatLng(25.056024, 121.523002);
         } else {
@@ -162,23 +191,23 @@ public final class MapManager {
     }
 
     public void animateToMe(float zoom) {
-        mapView.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(getLastPosition(), zoom));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastPosition(), zoom));
     }
 
     public void animateToMe() {
-        mapView.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(getLastPosition(), 17));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(getLastPosition(), 17));
     }
 
     public void animateTo(double lat, double lon) {
-        mapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
+        map.animateCamera(CameraUpdateFactory.newLatLng(new LatLng(lat, lon)));
     }
 
     public void animateTo(LatLng ll) {
-        mapView.getMap().animateCamera(CameraUpdateFactory.newLatLng(ll));
+        map.animateCamera(CameraUpdateFactory.newLatLng(ll));
     }
 
     public void animateTo(double lat, double lon, float zoom) {
-        mapView.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), zoom));
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lat, lon), zoom));
     }
 
     public void animateToDataCenter(String tableName, String where) {
@@ -211,7 +240,7 @@ public final class MapManager {
         return resMe;
     }
 
-    public void setResMe(int resMe) {
+    public void setResMe(@DrawableRes int resMe) {
         this.resMe = resMe;
     }
 
@@ -250,24 +279,27 @@ public final class MapManager {
     }
 
     public Marker addUserMarker(LatLng ll) {
-        me = mapView.getMap().addMarker(createUserMarker(ll));
+        me = map.addMarker(createUserMarker(ll));
         return me;
     }
 
     public Marker addUserMarker(int resUser) {
         MarkerOptions mo = new MarkerOptions();
-        me = mapView.getMap().addMarker(mo.position(getLastPosition()));
+        me = map.addMarker(mo.position(getLastPosition()));
         return me;
     }
 
-    public Marker addMarker(int resIcon, String title, LatLng pos) {
+    public Marker addMarker(@DrawableRes int resIcon, String title, LatLng pos) {
         return addMarker(resIcon, title, "", pos);
     }
 
-    public Marker addMarker(int resIcon, String title, String snippet, LatLng pos) {
+    public Marker addMarker(@DrawableRes int resIcon, String title, String snippet, LatLng pos) {
         MarkerOptions mo = new MarkerOptions().title(title).snippet(snippet).position(pos)
-                .icon(BitmapDescriptorFactory.fromResource(resIcon)).anchor(currentLayer.align.getXRatio(), currentLayer.align.getYRatio());
-        Marker m = mapView.getMap().addMarker(mo);
+                .anchor(currentLayer.align.getXRatio(), currentLayer.align.getYRatio());
+        if (resIcon != 0) {
+            mo.icon(BitmapDescriptorFactory.fromResource(resIcon));
+        }
+        Marker m = map.addMarker(mo);
         currentLayer.addMarker(m);
         return m;
     }
@@ -278,15 +310,18 @@ public final class MapManager {
 
     public Marker addMarker(Bitmap bmpIcon, String title, String snippet, LatLng pos) {
         MarkerOptions mo = new MarkerOptions().title(title).snippet(snippet).position(pos)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpIcon)).anchor(currentLayer.align.getXRatio(), currentLayer.align.getYRatio());
-        Marker m = mapView.getMap().addMarker(mo);
+                .anchor(currentLayer.align.getXRatio(), currentLayer.align.getYRatio());
+        if (bmpIcon != null) {
+            mo.icon(BitmapDescriptorFactory.fromBitmap(bmpIcon));
+        }
+        Marker m = map.addMarker(mo);
         currentLayer.addMarker(m);
         return m;
     }
 
     public Marker addMarker(String title, String snippet, LatLng pos) {
         MarkerOptions mo = new MarkerOptions().title(title).snippet(snippet).position(pos).anchor(currentLayer.align.getXRatio(), currentLayer.align.getYRatio());
-        Marker m = mapView.getMap().addMarker(mo);
+        Marker m = map.addMarker(mo);
         currentLayer.addMarker(m);
         return m;
     }
@@ -304,13 +339,34 @@ public final class MapManager {
     }
 
     public void setBubbleHandler(final BubbleHandler handler) {
-        mapView.getMap().setInfoWindowAdapter(handler);
-        mapView.getMap().setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+        map.setInfoWindowAdapter(handler);
+        map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             public void onInfoWindowClick(Marker marker) {
                 animateToMarker(marker);
                 handler.onClickBubble(marker);
             }
         });
+    }
+
+    public UiSettings getMapUiSetting() {
+        return map.getUiSettings();
+    }
+
+    public void enableToolbar() {
+        map.getUiSettings().setMapToolbarEnabled(true);
+    }
+
+    public void enableMyLocationButton() {
+        map.getUiSettings().setMyLocationButtonEnabled(true);
+        map.setMyLocationEnabled(true);
+    }
+
+    public void enableZoomControls() {
+        map.getUiSettings().setZoomControlsEnabled(true);
+    }
+
+    public boolean isMapPrepared() {
+        return map != null;
     }
 
     public void beforeActivitySaveInstanceState(Bundle outState) {
@@ -367,7 +423,7 @@ public final class MapManager {
                 if (routePaths == null) {
                     routePaths = new CopyOnWriteArrayList<Polyline>();
                 }
-                routePaths.add(mapView.getMap().addPolyline(rectLine));
+                routePaths.add(map.addPolyline(rectLine));
             }
         }.message("正在規劃路徑").execute();
     }

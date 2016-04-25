@@ -21,7 +21,6 @@ import grandroid.view.Face;
 import grandroid.view.LayoutMaker;
 
 /**
- *
  * @author Rovers
  */
 public abstract class GeoFace extends Face implements OnMapReadyCallback {
@@ -45,8 +44,8 @@ public abstract class GeoFace extends Face implements OnMapReadyCallback {
         //MapsInitializer.initialize(getActivity());
         map = new MapView(this, new GoogleMapOptions().camera(cameraPosition));
         map.onCreate(savedInstanceState);
-        map.getMap().setMyLocationEnabled(showMyPosition());        
-        manager = new MapManager(this, map);
+        map.getMap().setMyLocationEnabled(showMyPosition());
+        manager = new MapManager(this, map, this);
         return map;
     }
 
@@ -67,7 +66,7 @@ public abstract class GeoFace extends Face implements OnMapReadyCallback {
             throw ex;
         }
         //try {
-        //map.getMap().animateCamera(CameraUpdateFactory.newLatLngZoom(getDefaultPosition(), getDefaultZoom()));
+        //mapView.getMapView().animateCamera(CameraUpdateFactory.newLatLngZoom(getDefaultPosition(), getDefaultZoom()));
         //} catch (GooglePlayServicesNotAvailableException ex) {
         //    Log.e("grandroid", null, ex);
         //}
