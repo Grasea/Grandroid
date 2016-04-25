@@ -2,6 +2,7 @@ package grandroid.geo.sample;
 
 import android.location.Location;
 import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
