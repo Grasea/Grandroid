@@ -1,24 +1,14 @@
 package grandroid.sample;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Observable;
 import java.util.Observer;
 
-import grandroid.action.AsyncAction;
 import grandroid.action.GoAction;
-import grandroid.action.ToastAction;
-import grandroid.net.FilePoster;
-import grandroid.net.Mon;
 import grandroid.view.Face;
 import grandroid.view.fragment.DataEvent;
 
@@ -104,7 +94,7 @@ public class MainActivity extends Face implements Observer, View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn1:
-                new GoAction(this, ComponentTest1.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
+//                new GoAction(this, ComponentTest1.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();
                 break;
             case R.id.btn2:
                 new GoAction(this, ComponentTest2.class, R.id.frame).removeOldFace().goDirection(GoAction.Direction.Right).execute();

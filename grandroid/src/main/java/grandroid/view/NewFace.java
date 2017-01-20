@@ -12,12 +12,14 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
 import grandroid.app.AppStatus;
 import grandroid.service.MessageReceiver;
 import grandroid.data.DataAgent;
@@ -33,16 +35,17 @@ import grandroid.view.fragment.Component;
 import grandroid.view.fragment.DataEvent;
 import grandroid.view.fragment.DataEventHandler;
 import grandroid.view.fragment.ObserverTarget;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
  * @author Rovers
  */
-public class Face extends FragmentActivity implements Pendable, DataEventHandler {
+public class NewFace extends FragmentActivity implements Pendable, DataEventHandler {
 
     /**
      *
@@ -74,11 +77,21 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     public static final String FRAGMENT_CLASS = "FRAGMENT_CLASS";
     protected boolean notifyLeaving;
     protected long leavingTime;
+    /**
+     *
+     */
+    protected Boolean mIsCanEixt = true;
+    protected Boolean isRegistedListener = false;
+    protected HashSet<Integer> backStackSet = new HashSet<>();
+    private boolean needCheckBackStatck = false;
+    private FragmentManager.OnBackStackChangedListener listener;
+    private boolean isAddFragment = false;
+    private int lastBackStackCount = 0;
 
     /**
      *
      */
-    public Face() {
+    public NewFace() {
         super();
     }
 
@@ -145,8 +158,8 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
 //    protected void keepViewData(int viewID, boolean autofill) {
 //        getData().keep(this, viewID, autofill);
 //    }
+
     /**
-     *
      * @param menuID
      */
     protected void setMenuID(int menuID) {
@@ -154,7 +167,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param menu
      * @return
      */
@@ -178,7 +190,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param item
      * @return
      */
@@ -312,7 +323,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param act
      * @param icon
      */
@@ -334,6 +344,7 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
         if (observerMap == null) {
             observerMap = new ConcurrentHashMap<String, ObserverTarget>();
         }
+        registBackStackChangedListener();
 //        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
 //
 //            public void onBackStackChanged() {
@@ -346,6 +357,18 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
 //                }
 //            }
 //        });
+    }
+
+    public Component getLastComponent() {
+        FragmentManager fm = this.getSupportFragmentManager();
+        if (fm.getFragments() != null) {
+            for (int i = fm.getFragments().size() - 1; i >= 0; i--) {
+                if (fm.getFragments().get(i) != null && fm.getFragments().get(i) instanceof Component) {
+                    return (Component) fm.getFragments().get(i);
+                }
+            }
+        }
+        return null;
     }
 
     public Fragment getLastFragment() {
@@ -384,46 +407,77 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
         return -1;
     }
 
+
+    /**
+     * 新增一個Fragment並且顯示在最上層
+     */
+    public void prepareTurnToFragment() {
+        isAddFragment = true;
+        needCheckBackStatck = false;
+        mIsCanEixt = false;
+    }
+
+    /**
+     * @param mode 1: 下一頁不加進Back歷程,2: ClearTop
+     */
+    public void addComponentToBackStack(int mode) {
+        android.support.v4.app.FragmentManager fm = getSupportFragmentManager();
+        if (mode == 1) {
+            backStackSet.add(fm.getBackStackEntryCount() + 1);
+        }
+    }
+
+    public void resetBackStackSet() {
+        backStackSet.clear();
+    }
+
+    public void registBackStackChangedListener() {
+        if (!isRegistedListener) {
+            isRegistedListener = true;
+            if (listener == null) {
+                listener = getOnBackStackChangedListener();
+            }
+            getSupportFragmentManager().addOnBackStackChangedListener(listener);
+        }
+    }
+
     @Override
     public void onBackPressed() {
-        //if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
-        int index = findLastComponentIndex();
-        if (index > -1) {
-            List<Fragment> frags = getSupportFragmentManager().getFragments();
-            Component lastCom = (Component) frags.get(index);
-            //Log.d("grandroid", "Component " + lastCom.getClass().getSimpleName() + " can back?");
-            if (!lastCom.onBackPressed()) {
-                return;
-            }
-            int find = index - 1;
-            Fragment goBackTarget = null;
-            while (find >= 0) {
-                goBackTarget = frags.get(find);
-                if (goBackTarget != null && goBackTarget instanceof Component) {
-                    if (((Component) goBackTarget).getForgottenState() == 0 && ((Component) goBackTarget).canResume() && frags.size() > 1) {
-                        break;
-                    } else {
-                        goBackTarget = null;
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+        //Log.d("grandroid", "OnBackPress BackStackEntryCount:" + count);
+        if (count == 0) {
+            int index = findLastComponentIndex();
+            if (index > -1) {
+                List<Fragment> frags = getSupportFragmentManager().getFragments();
+                if (frags.get(index) instanceof Component) {
+                    Component lastCom = (Component) frags.get(index);
+                    //Log.d("grandroid", "Component " + lastCom.getClass().getSimpleName() + " can back?");
+                    if (!lastCom.onBackPressed()) {
+                        return;
                     }
-                    find--;
-                } else {
-                    break;
                 }
             }
-            if (goBackTarget != null) {
-                //back to the component
-                getSupportFragmentManager().popBackStack(frags.get(find + 1).getTag(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            if (notifyLeaving && System.currentTimeMillis() - leavingTime > 3000) {
+                leavingTime = System.currentTimeMillis();
+                Toast.makeText(this, getPressBackAgainMessage(), Toast.LENGTH_SHORT).show();
                 return;
             }
+            super.onBackPressed();
+            //additional code
+        } else {
+            boolean isNeedRemoveCount = backStackSet.contains(count);
+            if (isNeedRemoveCount) {
+                backStackSet.remove(count);
+            }
+            if (count == 1) {
+                getSupportFragmentManager().popBackStackImmediate();
+            } else {
+                getSupportFragmentManager().popBackStack();
+            }
         }
-        //}
-        if (notifyLeaving && System.currentTimeMillis() - leavingTime > 3000) {
-            leavingTime = System.currentTimeMillis();
-            Toast.makeText(this, getPressBackAgainMessage(), Toast.LENGTH_SHORT).show();
-            return;
-        }
-        super.onBackPressed();
+
     }
+
 
     protected String getPressBackAgainMessage() {
         return "再按一次返回鍵離開";
@@ -455,7 +509,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param intent
      */
     @Override
@@ -513,7 +566,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param requestCode
      * @param resultCode
      * @param data
@@ -552,7 +604,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param id
      * @return
      */
@@ -563,7 +614,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param model
      */
     protected void pickDateTime(DateTimePickModel model) {
@@ -572,7 +622,6 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
     }
 
     /**
-     *
      * @param <T>
      * @param cpm
      */
@@ -635,5 +684,54 @@ public class Face extends FragmentActivity implements Pendable, DataEventHandler
             Log.e("grandroid", null, ex);
         }
         return new Component();
+    }
+
+    private FragmentManager.OnBackStackChangedListener getOnBackStackChangedListener() {
+        FragmentManager.OnBackStackChangedListener result = new FragmentManager.OnBackStackChangedListener() {
+            public void onBackStackChanged() {
+                FragmentManager manager = getSupportFragmentManager();
+                if (manager != null) {
+                    int backStackEntryCount = manager.getBackStackEntryCount();
+                    //Log.d("grandroid", "OnBackStackChangedListener_count:" + backStackEntryCount);
+
+                    if (backStackEntryCount == 0) {
+                        if (!isAddFragment) {
+                            finish();
+                        }
+                    } else {
+                        boolean needForgetCurrentFace = backStackSet.contains(getSupportFragmentManager().getBackStackEntryCount());
+                        if (!needForgetCurrentFace || !needCheckBackStatck) {
+                            needCheckBackStatck = true;
+                            if (!isAddFragment) {
+
+                                Fragment fragment = manager.getFragments()
+                                        .get(backStackEntryCount - 1);
+                                if (fragment != null) {
+                                    fragment.onResume();
+                                }
+                                //Log.d("grandroid", "OnBackStackChangedListener_" + fragment.getClass().getSimpleName() + " onResume.");
+                            } else {
+                                if (lastBackStackCount > backStackEntryCount) {
+                                    Fragment fragment = manager.getFragments()
+                                            .get(backStackEntryCount - 1);
+                                    if (fragment != null) {
+                                        fragment.onResume();
+                                    }
+                                }
+                            }
+                            isAddFragment = false;
+                        } else {
+                            FragmentTransaction fragmentTransaction = manager.beginTransaction();
+                            fragmentTransaction.remove(manager.getFragments().get(getSupportFragmentManager().getBackStackEntryCount()));
+                            fragmentTransaction.commit();
+                            getSupportFragmentManager().popBackStack();
+                            backStackSet.remove(getSupportFragmentManager().getBackStackEntryCount());
+                        }
+                    }
+                    lastBackStackCount = backStackEntryCount;
+                }
+            }
+        };
+        return result;
     }
 }

@@ -14,19 +14,20 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+
 import grandroid.image.ImageUtil;
 import grandroid.image.PhotoAgent;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- *
  * @author Rovers
  */
 public abstract class PickPhotoAction extends PendingAction {
-
+    public boolean circleMode = false;
     /**
      *
      */
@@ -37,7 +38,6 @@ public abstract class PickPhotoAction extends PendingAction {
     protected int bitmapHeight;
 
     /**
-     *
      * @param context
      */
     public PickPhotoAction(Context context) {
@@ -45,7 +45,6 @@ public abstract class PickPhotoAction extends PendingAction {
     }
 
     /**
-     *
      * @param context
      * @param bitmapWidth
      * @param bitmapHeight
@@ -57,7 +56,18 @@ public abstract class PickPhotoAction extends PendingAction {
     }
 
     /**
-     *
+     * @param context
+     * @param bitmapWidth
+     * @param bitmapHeight
+     */
+    public PickPhotoAction(Context context, int bitmapWidth, int bitmapHeight, Boolean circleMode) {
+        super(context, 65012);
+        this.bitmapWidth = bitmapWidth;
+        this.bitmapHeight = bitmapHeight;
+        this.circleMode = circleMode;
+    }
+
+    /**
      * @param context
      * @param actionName
      */
@@ -66,20 +76,19 @@ public abstract class PickPhotoAction extends PendingAction {
     }
 
     /**
-     *
      * @param context
      * @param actionName
      * @param bitmapWidth
      * @param bitmapHeight
      */
-    public PickPhotoAction(Context context, String actionName, int bitmapWidth, int bitmapHeight) {
+    public PickPhotoAction(Context context, String actionName, int bitmapWidth, int bitmapHeight, Boolean circleMode) {
         super(context, actionName, 65012);
         this.bitmapWidth = bitmapWidth;
         this.bitmapHeight = bitmapHeight;
+        this.circleMode = circleMode;
     }
 
     /**
-     *
      * @return
      */
     @Override
@@ -93,7 +102,9 @@ public abstract class PickPhotoAction extends PendingAction {
             intent.putExtra("outputX", bitmapWidth);
             intent.putExtra("outputY", bitmapHeight);
             intent.putExtra("return-data", true);
-
+            if (circleMode) {
+                intent.putExtra("circleCrop", true);
+            }
             return intent;
         } else {
             Intent i = new Intent(Intent.ACTION_PICK);
@@ -103,7 +114,6 @@ public abstract class PickPhotoAction extends PendingAction {
     }
 
     /**
-     *
      * @param result
      * @param data
      * @return
@@ -190,10 +200,5 @@ public abstract class PickPhotoAction extends PendingAction {
         return false;
     }
 
-    /**
-     *
-     * @param context
-     * @param bitmap
-     */
     public abstract void execute(Context context, PhotoAgent photoAgent);
 }

@@ -10,14 +10,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 
 import grandroid.activity.ComponentActivity;
 import grandroid.app.AppStatus;
-import grandroid.view.Face;
+import grandroid.view.NewFace;
 import grandroid.view.R;
 import grandroid.view.fragment.Component;
 
@@ -26,7 +25,7 @@ import java.util.List;
 /**
  * @author Rovers
  */
-public class GoAction extends ContextAction {
+public class NewGoAction extends ContextAction {
 
     /**
      *
@@ -69,7 +68,7 @@ public class GoAction extends ContextAction {
      * @param context
      * @param c       target activity
      */
-    public GoAction(Context context, Class c) {
+    public NewGoAction(Context context, Class c) {
         super(context, "undefined");
         this.c = c;
     }
@@ -79,12 +78,12 @@ public class GoAction extends ContextAction {
      * @param actionName
      * @param cp
      */
-    public GoAction(Context context, String actionName, String cp) {
+    public NewGoAction(Context context, String actionName, String cp) {
         super(context, actionName);
         try {
             c = Class.forName(cp);
         } catch (ClassNotFoundException ex) {
-            Log.e(GoAction.class.getName(), null, ex);
+            Log.e(NewGoAction.class.getName(), null, ex);
         }
     }
 
@@ -93,24 +92,24 @@ public class GoAction extends ContextAction {
      * @param actionName
      * @param c
      */
-    public GoAction(Context context, String actionName, Class c) {
+    public NewGoAction(Context context, String actionName, Class c) {
         super(context, actionName);
         this.c = c;
     }
 
-    public GoAction(Activity activity, Class c, int container) {
+    public NewGoAction(Activity activity, Class c, int container) {
         super(activity, "undefined");
         this.c = c;
         this.container = container;
     }
 
-    public GoAction(Context context, Class c, int container) {
+    public NewGoAction(Context context, Class c, int container) {
         super(context, "undefined");
         this.c = c;
         this.container = container;
     }
 
-    public GoAction(Activity activity, String actionName, Class c, int container) {
+    public NewGoAction(Activity activity, String actionName, Class c, int container) {
         super(activity, actionName);
         this.c = c;
         this.container = container;
@@ -120,7 +119,7 @@ public class GoAction extends ContextAction {
      * @param bundle
      * @return
      */
-    public GoAction setBundle(Bundle bundle) {
+    public NewGoAction setBundle(Bundle bundle) {
         this.bundle = bundle;
         return this;
     }
@@ -130,7 +129,7 @@ public class GoAction extends ContextAction {
      * @param value
      * @return
      */
-    public GoAction addBundleObject(String key, String value) {
+    public NewGoAction addBundleObject(String key, String value) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -143,7 +142,7 @@ public class GoAction extends ContextAction {
      * @param value
      * @return
      */
-    public GoAction addBundleObject(String key, int value) {
+    public NewGoAction addBundleObject(String key, int value) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -156,7 +155,7 @@ public class GoAction extends ContextAction {
      * @param value
      * @return
      */
-    public GoAction addBundleObject(String key, boolean value) {
+    public NewGoAction addBundleObject(String key, boolean value) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -169,7 +168,7 @@ public class GoAction extends ContextAction {
      * @param strarr
      * @return
      */
-    public GoAction addBundleObject(String key, String[] strarr) {
+    public NewGoAction addBundleObject(String key, String[] strarr) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -182,7 +181,7 @@ public class GoAction extends ContextAction {
      * @param intarr
      * @return
      */
-    public GoAction addBundleObject(String key, int[] intarr) {
+    public NewGoAction addBundleObject(String key, int[] intarr) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -195,7 +194,7 @@ public class GoAction extends ContextAction {
      * @param value
      * @return
      */
-    public GoAction addBundleObject(String key, double value) {
+    public NewGoAction addBundleObject(String key, double value) {
         if (this.bundle == null) {
             bundle = new Bundle();
         }
@@ -203,15 +202,13 @@ public class GoAction extends ContextAction {
         return this;
     }
 
-    public GoAction setTransition(int enterTransition, int leaveTransition, int popEnterTransition, int popLeaveTransition) {
+    public NewGoAction setTransition(int enterTransition, int leaveTransition) {
         this.leaveTransition = leaveTransition;
         this.enterTransition = enterTransition;
-        this.popEnterTransition = popEnterTransition;
-        this.popLeaveTransition = popLeaveTransition;
         return this;
     }
 
-    public GoAction goDirection(Direction dir) {
+    public NewGoAction goDirection(Direction dir) {
         switch (dir) {
             case Left:
                 leaveTransition = R.anim.slide_in_left;
@@ -253,17 +250,17 @@ public class GoAction extends ContextAction {
      * @param flag
      * @return
      */
-    public GoAction setFlag(int flag) {
+    public NewGoAction setFlag(int flag) {
         this.flag = flag;
         return this;
     }
 
-    public GoAction addFlag(int flag) {
+    public NewGoAction addFlag(int flag) {
         this.flag = flag | flag;
         return this;
     }
 
-    public GoAction setContainer(int container) {
+    public NewGoAction setContainer(int container) {
         this.container = container;
         return this;
     }
@@ -274,13 +271,13 @@ public class GoAction extends ContextAction {
      * @param anchorClass
      * @return
      */
-    public GoAction before(Class anchorClass) {
+    public NewGoAction before(Class anchorClass) {
         beforeAnchor = true;
         this.anchorClass = anchorClass;
         return this;
     }
 
-    public GoAction after(Class anchorClass) {
+    public NewGoAction after(Class anchorClass) {
         beforeAnchor = false;
         this.anchorClass = anchorClass;
         return this;
@@ -289,12 +286,12 @@ public class GoAction extends ContextAction {
     /**
      * @return
      */
-    public GoAction forgetCurrentFace() {
+    public NewGoAction forgetCurrentNewFace() {
         forgetCurrent = true;
         return this;
     }
 
-    public GoAction cancelAnimation() {
+    public NewGoAction cancelAnimation() {
         noAnimation = true;
         return this;
     }
@@ -302,14 +299,14 @@ public class GoAction extends ContextAction {
     /**
      * @return
      */
-    public GoAction removeOldFace() {
+    public NewGoAction removeOldNewFace() {
         return setFlag(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     }
 
     /**
      * @return
      */
-    public GoAction setSubTask() {
+    public NewGoAction setSubTask() {
         return setSubTask(0);
     }
 
@@ -317,26 +314,27 @@ public class GoAction extends ContextAction {
      * @param requestCode
      * @return
      */
-    public GoAction setSubTask(int requestCode) {
+    public NewGoAction setSubTask(int requestCode) {
         isSubTask = true;
         this.requestCode = requestCode;
         return this;
     }
 
-    public GoAction setUri(Uri uri) {
+    public NewGoAction setUri(Uri uri) {
         this.uri = uri;
         return this;
     }
 
-    public GoAction asActionView() {
+    public NewGoAction asActionView() {
         this.intentAction = Intent.ACTION_VIEW;
         return this;
     }
 
-    public GoAction setIntentAction(String intentAction) {
+    public NewGoAction setIntentAction(String intentAction) {
         this.intentAction = intentAction;
         return this;
     }
+
 
     /**
      * @param context
@@ -347,59 +345,90 @@ public class GoAction extends ContextAction {
         if (context != null && c != null) {
             if (Fragment.class.isAssignableFrom(c)) {
                 if (container > 0) {
-                    final FragmentManager fm = ((FragmentActivity) context).getSupportFragmentManager();
-                    try {
-                        if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP) {
-                            fm.popBackStack(c.getSimpleName(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                        }
-                        if (anchorClass != null) {
-                            int anchorIndex = findAnchorTag(fm);
-                            if (anchorIndex >= 0) {
-                                fm.popBackStack(anchorIndex, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                            }
-                            if (beforeAnchor) {
-                                fm.popBackStack();
-                            }
-                        }
-                    } catch (Exception ex) {
-                        Log.e("grandroid", null, ex);
+                    NewFace face = ((NewFace) context);
+                    face.prepareTurnToFragment();
+                    android.support.v4.app.FragmentManager fm = face.getSupportFragmentManager();
+                    Fragment fragment = fm.findFragmentByTag(c.getSimpleName());
+                    boolean isFragmentExist = fragment != null;
+//                    if (fragment == null) {
+                    Component lastComponent = face.getLastComponent();
+                    if (isFragmentExist) {
+                        Log.i("grandroid", "lastComponent:" + lastComponent.getClass().getSimpleName() + ", new Component:" + c.getSimpleName());
                     }
-                    Fragment leavingFragment = findLastFragment(fm);
-                    if (leavingFragment instanceof Component) {
-                        if (((Component) leavingFragment).getForgottenState() == 1) {
-                            ((Component) leavingFragment).setForgottenState(2);
+                    if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP && isFragmentExist
+                            && lastComponent.getClass().getSimpleName().equals(c.getSimpleName())) {
+                    } else {
+                        try {
+//                        isFragmentExist = false;
+                            fragment = (Fragment) Component.createInstance(c);
+                            fragment.setArguments(new Bundle());
+                        } catch (Exception e) {
+                            Log.e("grandroid", null, e);
                         }
+                    }
+
+//                    }
+
+//                    if (fragment.isAdded()) {
+//
+//                        return true;
+//                    }
+                    if (bundle != null && !bundle.isEmpty()) {
+                        fragment.getArguments().putAll(bundle);
                     }
                     FragmentTransaction ft = fm.beginTransaction();
-                    if (enterTransition != 0 && leaveTransition != 0) {
-                        ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
-                    }
-                    try {
-                        Fragment f = (Fragment) Component.createInstance(c);
-                        if (bundle != null) {
-                            f.setArguments(bundle);
-                        }
-                        if (forgetCurrent) {
-                            if (f instanceof Component) {
-                                ((Component) f).setForgottenState(1);
+//        ft.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right,
+//                R.anim.slide_in_right, R.anim.slide_out_left);
+                    if ((flag & Intent.FLAG_ACTIVITY_CLEAR_TOP) == Intent.FLAG_ACTIVITY_CLEAR_TOP) {
+                        if (lastComponent != null && lastComponent.getClass().getSimpleName().equals(c.getSimpleName())) {
+                            lastComponent.onResume();
+                        } else {
+                            if (!isFragmentExist && enterTransition != 0 && leaveTransition != 0 && popEnterTransition != 0 && popLeaveTransition != 0) {
+                                ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
+                            }
+                            if (lastComponent != null) {
+                                Log.e("grandroid", "Clear Top & Hide Component:" + lastComponent.getClass().getSimpleName());
+                                ft.hide(lastComponent);
+                            } else {
+                                Log.e("grandroid", "Clear Top getLastFragment is null");
+                            }
+                            if (isFragmentExist) {
+                                fm.popBackStack(c.getSimpleName(), 0);
+                                face.resetBackStackSet();
+                                Log.e("grandroid", "Clear Top & popBackStack:" + c.getSimpleName());
+                            } else {
+                                ft.add(container, fragment, c.getSimpleName());
+                                ft.addToBackStack(c.getSimpleName());
+                                Log.e("grandroid", "Clear Top & add new Component:" + c.getSimpleName());
                             }
                         }
-                        ft.replace(container, f, c.getSimpleName());
-                        //if (!forgetCurrent) {
-                        if (fm.getFragments() != null && hasRecoverableFragment(fm)) {//
-                            ft.addToBackStack(c.getSimpleName());
-                            Log.d("grandroid", "addToBackStack: " + c.getSimpleName());
-                            //}else{
-                            //    Log.d("grandroid", "not addToBackStack: " + c.getSimpleName());
+
+                    } else {
+                        if (enterTransition != 0 && leaveTransition != 0 && popEnterTransition != 0 && popLeaveTransition != 0) {
+                            ft.setCustomAnimations(enterTransition, leaveTransition, popEnterTransition, popLeaveTransition);
                         }
-                        //}
-                        ft.commit();
-                    } catch (Exception ex) {
-                        Log.e("grandroid", null, ex);
+                        if (lastComponent != null) {
+                            Log.e("grandroid", "Hide Component:" + lastComponent.getClass().getSimpleName());
+                            ft.hide(lastComponent);
+                        }
+
+                        if (isFragmentExist) {
+                            ft.add(container, fragment, c.getSimpleName());
+                            ft.addToBackStack(c.getSimpleName());
+                            Log.e("grandroid", "addToBackStack & Component is Exist:" + c.getSimpleName());
+                        } else {
+                            ft.add(container, fragment, c.getSimpleName());
+                            ft.addToBackStack(c.getSimpleName());
+                            Log.e("grandroid", "addToBackStack & Component is NOT Exist:" + c.getSimpleName());
+                        }
+                    }
+                    ft.commit();
+                    if (forgetCurrent) {
+                        face.addComponentToBackStack(1);
                     }
                 } else {
                     Intent intent = new Intent();
-                    String s = AppStatus.getMetaData(context, "BaseFaceClass");
+                    String s = AppStatus.getMetaData(context, "BaseNewFaceClass");
                     if (s.isEmpty()) {
                         intent.setClass(context, ComponentActivity.class);
                     } else {
@@ -411,11 +440,11 @@ public class GoAction extends ContextAction {
                         }
                     }
                     if (bundle != null) {
-                        bundle.putString(Face.FRAGMENT_CLASS, c.getName());
+                        bundle.putString(NewFace.FRAGMENT_CLASS, c.getName());
                         intent.putExtras(bundle);
                     } else {
                         bundle = new Bundle();
-                        bundle.putString(Face.FRAGMENT_CLASS, c.getName());
+                        bundle.putString(NewFace.FRAGMENT_CLASS, c.getName());
                         intent.putExtras(bundle);
                     }
                     if (flag > 0) {
@@ -496,7 +525,7 @@ public class GoAction extends ContextAction {
     }
 
     protected Fragment findLastFragment(FragmentManager fm) {
-        if (context instanceof Face) {
+        if (context instanceof NewFace) {
             if (fm.getFragments() != null) {
                 for (int i = fm.getFragments().size() - 1; i >= 0; i--) {
                     if (fm.getFragments().get(i) != null) {
