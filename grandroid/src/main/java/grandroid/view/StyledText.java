@@ -20,7 +20,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 /**
- *
  * @author Rovers
  */
 public class StyledText {
@@ -220,7 +219,7 @@ public class StyledText {
     public TextView get() {
         if (txt == null && tv.getText().toString().contains("</")) {
             this.txt = Html.fromHtml(tv.getText().toString());
-        } 
+        }
         apply(tv, this.txt);
         return tv;
     }
@@ -274,7 +273,7 @@ public class StyledText {
         if (allowChars != null) {
             InputFilter filter = new InputFilter() {
                 public CharSequence filter(CharSequence source, int start, int end,
-                        Spanned dest, int dstart, int dend) {
+                                           Spanned dest, int dstart, int dend) {
                     String replacement = source.subSequence(start, end).toString();
                     String finalString = replacement.replaceAll("[^" + allowChars + "]", "");
                     return finalString.equals(replacement) ? null : finalString;
@@ -313,10 +312,9 @@ public class StyledText {
                     ((EditText) tv).setInputType(InputType.TYPE_CLASS_PHONE);
                     break;
                 case English:
-                    ((EditText) tv).setImeOptions(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                    ((EditText) tv).setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                     break;
                 case Password:
-                    ((EditText) tv).setImeOptions(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                     ((EditText) tv).setTransformationMethod(PasswordTransformationMethod.getInstance());
                     ((EditText) tv).setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                     break;
@@ -345,16 +343,16 @@ public class StyledText {
                 et.setInputType(InputType.TYPE_CLASS_PHONE);
                 break;
             case English:
-                et.setInputType(InputType.TYPE_CLASS_TEXT);
-                et.setImeOptions(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+//                et.setInputType(InputType.TYPE_CLASS_TEXT);
+                et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
                 break;
             case Password:
                 et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-                et.setImeOptions(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+//                et.setImeOptions(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                 break;
             case Default:
                 et.setInputType(InputType.TYPE_CLASS_TEXT);
-                et.setImeOptions(InputType.TYPE_CLASS_TEXT);
+//                et.setImeOptions(InputType.TYPE_CLASS_TEXT);
                 break;
         }
     }

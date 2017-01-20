@@ -286,13 +286,17 @@ public class PhotoAgent {
      * @return
      */
     public boolean save(File file, Bitmap.CompressFormat format) {
+        return save(file, 100, format);
+    }
+
+    public boolean save(File file, int quality, Bitmap.CompressFormat format) {
         FileOutputStream bos = null;
         try {
             bos = new FileOutputStream(file.getAbsolutePath());
             /*
              * 檔案轉換
              */
-            bmp.compress(format, 100, bos);
+            bmp.compress(format, quality, bos);
             /*
              * 呼叫flush()方法，更新BufferStream
              */
