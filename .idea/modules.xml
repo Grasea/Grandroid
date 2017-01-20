@@ -3,10 +3,16 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Grandroid.iml" filepath="$PROJECT_DIR$/Grandroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GrandroidGradle.iml" filepath="$PROJECT_DIR$/GrandroidGradle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grandroid/grandroid.iml" filepath="$PROJECT_DIR$/grandroid/grandroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/grandroid/grandroid.iml" filepath="$PROJECT_DIR$/grandroid/grandroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/grandroid-database/grandroid-database.iml" filepath="$PROJECT_DIR$/grandroid-database/grandroid-database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grandroid-database/grandroid-database.iml" filepath="$PROJECT_DIR$/grandroid-database/grandroid-database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/grangeo/grangeo.iml" filepath="$PROJECT_DIR$/grangeo/grangeo.iml" />
       <module fileurl="file://$PROJECT_DIR$/grangeo/grangeo.iml" filepath="$PROJECT_DIR$/grangeo/grangeo.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample-grandroid/sample-grandroid.iml" filepath="$PROJECT_DIR$/sample-grandroid/sample-grandroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample-grandroid/sample-grandroid.iml" filepath="$PROJECT_DIR$/sample-grandroid/sample-grandroid.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample-grangeo/sample-grangeo.iml" filepath="$PROJECT_DIR$/sample-grangeo/sample-grangeo.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample-grangeo/sample-grangeo.iml" filepath="$PROJECT_DIR$/sample-grangeo/sample-grangeo.iml" />
     </modules>
   </component>
